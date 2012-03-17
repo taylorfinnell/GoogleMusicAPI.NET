@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleMusicTest", "GoogleMusicTest\GoogleMusicTest.csproj", "{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleMusicAPI.NET", "GoogleMusicAPI.NET\GoogleMusicAPI.NET.csproj", "{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Debug|x86.ActiveCfg = Debug|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Debug|x86.Build.0 = Debug|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Release|Any CPU.ActiveCfg = Release|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Release|Mixed Platforms.Build.0 = Release|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Release|x86.ActiveCfg = Release|x86
+		{52E3DF15-FABB-4F94-84CB-0E3EB8E0BDC3}.Release|x86.Build.0 = Release|x86
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A59777A2-F0D3-41DA-9F2D-C7BA0178090B}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
