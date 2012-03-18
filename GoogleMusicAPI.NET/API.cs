@@ -24,6 +24,9 @@ namespace GoogleMusicAPI
         public delegate void _GetPlaylists(GoogleMusicPlaylists pls);
         public  _GetPlaylists OnGetPlaylistsComplete;
 
+        public delegate void _GetPlaylist(GoogleMusicPlaylist pls);
+        public _GetPlaylist OnGetPlaylistComplete;
+
         public delegate void _GetSongURL(GoogleMusicSongUrl songurl);
         public  _GetSongURL OnGetSongURL;
 
@@ -208,9 +211,45 @@ namespace GoogleMusicAPI
         /// <summary>
         /// Returns all user and instant playlists
         /// </summary>
-        public void GetPlaylists()
+        public void GetPlaylist(String plID = "all")
         {
-            client.UploadDataAsync(new Uri("https://play.google.com/music/services/loadplaylist"), FormBuilder.Empty, PlaylistRecv);
+            String jsonString = (plID.Equals("all")) ? "{}" : "{\"id\":\"" + plID + "\"}";
+
+            Dictionary<String, String> fields = new Dictionary<String, String>() { };
+
+            fields.Add("json", jsonString);
+
+            FormBuilder builder = new FormBuilder();
+            builder.AddFields(fields);
+            builder.Close();
+
+            if (plID.Equals("all"))
+                client.UploadDataAsync(new Uri("https://play.google.com/music/services/loadplaylist"), builder, PlaylistRecv);
+            else
+                client.UploadDataAsync(new Uri("https://play.google.com/music/services/loadplaylist"), builder, PlaylistRecvSingle);
+        }
+
+        private void PlaylistRecvSingle(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
+        {
+            if (error != null)
+            {
+                ThrowError(error);
+                return;
+            }
+
+            GoogleMusicPlaylist pl = null;
+            try
+            {
+                pl = JsonConvert.DeserializeObject<GoogleMusicPlaylist>(jsonData);
+            }
+            catch (Exception e)
+            {
+                ThrowError(error);
+                return;
+            }
+
+            if (OnGetPlaylistComplete != null)
+                OnGetPlaylistComplete(pl);
         }
 
         private void PlaylistRecv(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
@@ -218,6 +257,7 @@ namespace GoogleMusicAPI
             if (error != null)
             {
                 ThrowError(error);
+                return;
             }
 
             GoogleMusicPlaylists playlists = null;
@@ -228,11 +268,16 @@ namespace GoogleMusicAPI
             catch (Exception e)
             {
                 ThrowError(error);
+                return;
             }
 
             if (OnGetPlaylistsComplete != null)
                 OnGetPlaylistsComplete(playlists);
         }
+        #endregion
+
+        #region GetAutoPlaylists
+
         #endregion
 
         #region GetSongURL

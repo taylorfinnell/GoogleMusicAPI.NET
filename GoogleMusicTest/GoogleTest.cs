@@ -27,6 +27,12 @@ namespace GoogleMusicTest
             api.OnGetPlaylistsComplete += new API._GetPlaylists(api_OnGetPlaylistsComplete);
             api.OnGetSongURL += new API._GetSongURL(api_OnGetSongURL);
             api.OnDeletePlaylist += new API._DeletePlaylist(api_OnDeletePlaylist);
+            api.OnGetPlaylistComplete += api_OnGetPlaylistComplete; 
+        }
+
+        void api_OnGetPlaylistComplete(GoogleMusicPlaylist pls)
+        {
+            int k = 0;
         }
 
         void api_OnDeletePlaylist(DeletePlaylistResp resp)
@@ -111,7 +117,7 @@ namespace GoogleMusicTest
 
         private void btnGetPlaylists_Click(object sender, EventArgs e)
         {
-            api.GetPlaylists();
+            api.GetPlaylist();
         }
 
         private void btnSongURL_Click(object sender, EventArgs e)
@@ -133,6 +139,21 @@ namespace GoogleMusicTest
             }
 
             api.DeletePlaylist(id);
+        }
+
+        private void btnGetPlaylistSongs_Click(object sender, EventArgs e)
+        {
+            String id = "";
+            foreach (GoogleMusicPlaylist pl in pls.UserPlaylists)
+            {
+                if (pl.Title.Equals(lbPlaylists.SelectedItem.ToString()))
+                {
+                    id = pl.PlaylistID;
+                    break;
+                }
+            }
+
+            api.GetPlaylist(id);
         }
     }
 }

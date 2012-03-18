@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnDeletePl = new System.Windows.Forms.Button();
+            this.btnSongURL = new System.Windows.Forms.Button();
             this.btnGetPlaylists = new System.Windows.Forms.Button();
             this.btnFetchSongs = new System.Windows.Forms.Button();
             this.btnCreatePl = new System.Windows.Forms.Button();
@@ -38,16 +40,15 @@
             this.tbPass = new System.Windows.Forms.TextBox();
             this.tbEmail = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.btnSongURL = new System.Windows.Forms.Button();
-            this.panel3 = new System.Windows.Forms.Panel();
+            this.lvSongs = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.lvSongs = new System.Windows.Forms.ListView();
+            this.panel3 = new System.Windows.Forms.Panel();
             this.lbPlaylists = new System.Windows.Forms.ListBox();
-            this.btnDeletePl = new System.Windows.Forms.Button();
+            this.btnGetPlaylistSongs = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -55,6 +56,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnGetPlaylistSongs);
             this.panel1.Controls.Add(this.btnDeletePl);
             this.panel1.Controls.Add(this.btnSongURL);
             this.panel1.Controls.Add(this.btnGetPlaylists);
@@ -70,6 +72,26 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(745, 98);
             this.panel1.TabIndex = 0;
+            // 
+            // btnDeletePl
+            // 
+            this.btnDeletePl.Location = new System.Drawing.Point(510, 32);
+            this.btnDeletePl.Name = "btnDeletePl";
+            this.btnDeletePl.Size = new System.Drawing.Size(138, 23);
+            this.btnDeletePl.TabIndex = 9;
+            this.btnDeletePl.Text = "Delete selected playlist";
+            this.btnDeletePl.UseVisualStyleBackColor = true;
+            this.btnDeletePl.Click += new System.EventHandler(this.btnDeletePl_Click);
+            // 
+            // btnSongURL
+            // 
+            this.btnSongURL.Location = new System.Drawing.Point(510, 3);
+            this.btnSongURL.Name = "btnSongURL";
+            this.btnSongURL.Size = new System.Drawing.Size(138, 23);
+            this.btnSongURL.TabIndex = 8;
+            this.btnSongURL.Text = "Get Selected Song URL";
+            this.btnSongURL.UseVisualStyleBackColor = true;
+            this.btnSongURL.Click += new System.EventHandler(this.btnSongURL_Click);
             // 
             // btnGetPlaylists
             // 
@@ -154,24 +176,21 @@
             this.panel2.Size = new System.Drawing.Size(745, 483);
             this.panel2.TabIndex = 1;
             // 
-            // btnSongURL
+            // lvSongs
             // 
-            this.btnSongURL.Location = new System.Drawing.Point(510, 3);
-            this.btnSongURL.Name = "btnSongURL";
-            this.btnSongURL.Size = new System.Drawing.Size(138, 23);
-            this.btnSongURL.TabIndex = 8;
-            this.btnSongURL.Text = "Get Selected Song URL";
-            this.btnSongURL.UseVisualStyleBackColor = true;
-            this.btnSongURL.Click += new System.EventHandler(this.btnSongURL_Click);
-            // 
-            // panel3
-            // 
-            this.panel3.Controls.Add(this.lbPlaylists);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel3.Location = new System.Drawing.Point(0, 0);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(121, 483);
-            this.panel3.TabIndex = 0;
+            this.lvSongs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5});
+            this.lvSongs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvSongs.Location = new System.Drawing.Point(121, 0);
+            this.lvSongs.Name = "lvSongs";
+            this.lvSongs.Size = new System.Drawing.Size(624, 483);
+            this.lvSongs.TabIndex = 2;
+            this.lvSongs.UseCompatibleStateImageBehavior = false;
+            this.lvSongs.View = System.Windows.Forms.View.Details;
             // 
             // columnHeader1
             // 
@@ -196,21 +215,14 @@
             // 
             this.columnHeader5.Text = "gid";
             // 
-            // lvSongs
+            // panel3
             // 
-            this.lvSongs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4,
-            this.columnHeader5});
-            this.lvSongs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvSongs.Location = new System.Drawing.Point(121, 0);
-            this.lvSongs.Name = "lvSongs";
-            this.lvSongs.Size = new System.Drawing.Size(624, 483);
-            this.lvSongs.TabIndex = 2;
-            this.lvSongs.UseCompatibleStateImageBehavior = false;
-            this.lvSongs.View = System.Windows.Forms.View.Details;
+            this.panel3.Controls.Add(this.lbPlaylists);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel3.Location = new System.Drawing.Point(0, 0);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(121, 483);
+            this.panel3.TabIndex = 0;
             // 
             // lbPlaylists
             // 
@@ -221,15 +233,15 @@
             this.lbPlaylists.Size = new System.Drawing.Size(121, 483);
             this.lbPlaylists.TabIndex = 4;
             // 
-            // btnDeletePl
+            // btnGetPlaylistSongs
             // 
-            this.btnDeletePl.Location = new System.Drawing.Point(510, 38);
-            this.btnDeletePl.Name = "btnDeletePl";
-            this.btnDeletePl.Size = new System.Drawing.Size(138, 23);
-            this.btnDeletePl.TabIndex = 9;
-            this.btnDeletePl.Text = "Delete selected playlist";
-            this.btnDeletePl.UseVisualStyleBackColor = true;
-            this.btnDeletePl.Click += new System.EventHandler(this.btnDeletePl_Click);
+            this.btnGetPlaylistSongs.Location = new System.Drawing.Point(510, 64);
+            this.btnGetPlaylistSongs.Name = "btnGetPlaylistSongs";
+            this.btnGetPlaylistSongs.Size = new System.Drawing.Size(138, 23);
+            this.btnGetPlaylistSongs.TabIndex = 10;
+            this.btnGetPlaylistSongs.Text = "Get playlist songs";
+            this.btnGetPlaylistSongs.UseVisualStyleBackColor = true;
+            this.btnGetPlaylistSongs.Click += new System.EventHandler(this.btnGetPlaylistSongs_Click);
             // 
             // GoogleTest
             // 
@@ -271,6 +283,7 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.ListBox lbPlaylists;
         private System.Windows.Forms.Button btnDeletePl;
+        private System.Windows.Forms.Button btnGetPlaylistSongs;
 
     }
 }
