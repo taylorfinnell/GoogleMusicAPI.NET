@@ -44,22 +44,18 @@ namespace GoogleMusicAPI
             // Create the request
             HttpWebRequest request = SetupRequest(address);
             
-#if !DOTNETCORE
+#if !NETFX_CORE
             request.ContentLength = (data != null) ? data.Length : 0;
 #endif
 
             if (!String.IsNullOrEmpty(contentType))
                 request.ContentType = contentType;
+
             request.Method = "POST";
-
-            // Create an object to hold all of the state for this request
             RequestState state = new RequestState(request, data, millisecondsTimeout, completedCallback, progressCallback);
-
-            // Start the request for a stream to upload to
             IAsyncResult result = request.BeginGetRequestStream(OpenWrite, state);
-            // Register a timeout for the request
 
-#if !DOTNETCORE
+#if !NETFX_CORE
             ThreadPool.RegisterWaitForSingleObject(result.AsyncWaitHandle, TimeoutCallback, state, millisecondsTimeout, true);
 #endif
 
@@ -67,28 +63,22 @@ namespace GoogleMusicAPI
         }
 
 
-        public HttpWebRequest DownloadStringAsync(Uri address, int millisecondsTimeout, RequestCompletedEventHandler completedCallback, FormBuilder b = null)
+        public HttpWebRequest DownloadStringAsync(Uri address,  RequestCompletedEventHandler completedCallback, int millisecondsTimeout = 10000)
         {
-            // Create the request
             HttpWebRequest request = SetupRequest(address);
             request.Method = "GET";
-            if (b != null)
-                request.ContentType = b.ContentType;
-            DownloadDataAsync(request, (b!=null)?b.GetBytes():null, millisecondsTimeout, completedCallback);
+            DownloadDataAsync(request, null, millisecondsTimeout, completedCallback);
             return request;
         }
 
         public void DownloadDataAsync(HttpWebRequest request, byte[] d,  int millisecondsTimeout,
            RequestCompletedEventHandler completedCallback)
         {
-            // Create an object to hold all of the state for this request
             RequestState state = new RequestState(request, d, millisecondsTimeout, completedCallback, null);
 
-            // Start the request for the remote server response
             IAsyncResult result = request.BeginGetResponse(GetResponse, state);
 
-            // Register a timeout for the request
-#if !DOTNETCORE
+#if !NETFX_CORE
             ThreadPool.RegisterWaitForSingleObject(result.AsyncWaitHandle, TimeoutCallback, state, millisecondsTimeout, true);
 #endif
         }
@@ -99,18 +89,12 @@ namespace GoogleMusicAPI
             if (address == null)
                 throw new ArgumentNullException("address");
 
-            // Create the request
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(address);
 
-#if !DOTNETCORE
-            // Leave idle connections to this endpoint open for up to 60 seconds
+#if !NETFX_CORE
             request.ServicePoint.MaxIdleTime = 1000 * 60;
-            // Disable stupid Expect-100: Continue header
             request.ServicePoint.Expect100Continue = false;
-            // Crank up the max number of connections per endpoint (default is 2!)
             request.ServicePoint.ConnectionLimit = 20;
-            // Caps requests are never sent as trickles of data, so Nagle's
-            // coalescing algorithm won't help us
             request.ServicePoint.UseNagleAlgorithm = false;
 #endif
 
@@ -149,17 +133,15 @@ namespace GoogleMusicAPI
                     if (state.ProgressCallback != null)
                         state.ProgressCallback(state.Request, 100);
 
-#if !DOTNETCORE
+#if !NETFX_CORE
                     ms.Close();
                     uploadStream.Close();
 #endif
                 }
 
-                // Start the request for the remote server response
                 IAsyncResult result = state.Request.BeginGetResponse(GetResponse, state);
-                // Register a timeout for the request
 
-#if !DOTNETCORE
+#if !NETFX_CORE
                 ThreadPool.RegisterWaitForSingleObject(result.AsyncWaitHandle, TimeoutCallback, state,
                     state.MillisecondsTimeout, true);
 #endif
@@ -188,7 +170,7 @@ namespace GoogleMusicAPI
 
                     result = reader.ReadToEnd();
 
-#if !DOTNETCORE
+#if !NETFX_CORE
                     reader.Close();
                     responseStream.Close();
 #endif
