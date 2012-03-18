@@ -23,6 +23,12 @@ namespace GoogleMusicTest
             api.OnGetAllSongsComplete += GetAllSongsDone;
             api.OnCreatePlaylistComplete += api_OnCreatePlaylistComplete;
             api.OnGetPlaylistsComplete += new API._GetPlaylists(api_OnGetPlaylistsComplete);
+            api.OnGetSongURL += new API._GetSongURL(api_OnGetSongURL);
+        }
+
+        void api_OnGetSongURL(GoogleMusicSongUrl songurl)
+        {
+            new WebClient().DownloadFile(songurl.URL, "C:\\test.mp3");
         }
 
         void api_OnGetPlaylistsComplete(GoogleMusicPlaylists pls)
@@ -59,10 +65,13 @@ namespace GoogleMusicTest
                 lvi.SubItems.Add(song.Title);
                 lvi.SubItems.Add(song.Artist);
                 lvi.SubItems.Add(song.Album);
-
+                lvi.SubItems.Add(song.ID);
                 this.Invoke(new MethodInvoker( delegate {
                     lvSongs.Items.Add(lvi);
                 }));
+
+                if (num >= 100)
+                    break;
             }
         }
 
@@ -90,6 +99,12 @@ namespace GoogleMusicTest
         private void btnGetPlaylists_Click(object sender, EventArgs e)
         {
             api.GetPlaylists();
+        }
+
+        private void btnSongURL_Click(object sender, EventArgs e)
+        {
+            String id = lvSongs.SelectedItems[0].SubItems[4].Text;
+            api.GetSongURL(id);
         }
     }
 }

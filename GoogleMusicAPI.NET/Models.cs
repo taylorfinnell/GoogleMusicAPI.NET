@@ -11,6 +11,12 @@ using Newtonsoft.Json;
 
 namespace GoogleMusicAPI
 {
+    public class GoogleMusicSongUrl
+    {
+        [JsonProperty("url")]
+        public String URL { get; set; }
+    };
+
     public class AddPlaylistResp
     {
         [JsonProperty("id")]

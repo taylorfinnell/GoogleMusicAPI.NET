@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnGetPlaylists = new System.Windows.Forms.Button();
             this.btnFetchSongs = new System.Windows.Forms.Button();
             this.btnCreatePl = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -37,19 +38,23 @@
             this.tbPass = new System.Windows.Forms.TextBox();
             this.tbEmail = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.lvSongs = new System.Windows.Forms.ListView();
+            this.btnSongURL = new System.Windows.Forms.Button();
+            this.panel3 = new System.Windows.Forms.Panel();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.btnGetPlaylists = new System.Windows.Forms.Button();
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.lvSongs = new System.Windows.Forms.ListView();
             this.lbPlaylists = new System.Windows.Forms.ListBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnSongURL);
             this.panel1.Controls.Add(this.btnGetPlaylists);
             this.panel1.Controls.Add(this.btnFetchSongs);
             this.panel1.Controls.Add(this.btnCreatePl);
@@ -63,6 +68,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(745, 98);
             this.panel1.TabIndex = 0;
+            // 
+            // btnGetPlaylists
+            // 
+            this.btnGetPlaylists.Location = new System.Drawing.Point(349, 33);
+            this.btnGetPlaylists.Name = "btnGetPlaylists";
+            this.btnGetPlaylists.Size = new System.Drawing.Size(132, 23);
+            this.btnGetPlaylists.TabIndex = 7;
+            this.btnGetPlaylists.Text = "Fetch Playlists";
+            this.btnGetPlaylists.UseVisualStyleBackColor = true;
+            this.btnGetPlaylists.Click += new System.EventHandler(this.btnGetPlaylists_Click);
             // 
             // btnFetchSongs
             // 
@@ -129,28 +144,32 @@
             // 
             // panel2
             // 
-            this.panel2.Controls.Add(this.lbPlaylists);
             this.panel2.Controls.Add(this.lvSongs);
+            this.panel2.Controls.Add(this.panel3);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 98);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(745, 483);
             this.panel2.TabIndex = 1;
             // 
-            // lvSongs
+            // btnSongURL
             // 
-            this.lvSongs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4});
-            this.lvSongs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvSongs.Location = new System.Drawing.Point(0, 0);
-            this.lvSongs.Name = "lvSongs";
-            this.lvSongs.Size = new System.Drawing.Size(745, 483);
-            this.lvSongs.TabIndex = 0;
-            this.lvSongs.UseCompatibleStateImageBehavior = false;
-            this.lvSongs.View = System.Windows.Forms.View.Details;
+            this.btnSongURL.Location = new System.Drawing.Point(510, 3);
+            this.btnSongURL.Name = "btnSongURL";
+            this.btnSongURL.Size = new System.Drawing.Size(138, 23);
+            this.btnSongURL.TabIndex = 8;
+            this.btnSongURL.Text = "Get Selected Song URL";
+            this.btnSongURL.UseVisualStyleBackColor = true;
+            this.btnSongURL.Click += new System.EventHandler(this.btnSongURL_Click);
+            // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.lbPlaylists);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel3.Location = new System.Drawing.Point(0, 0);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(121, 483);
+            this.panel3.TabIndex = 0;
             // 
             // columnHeader1
             // 
@@ -171,24 +190,34 @@
             this.columnHeader4.Text = "Album";
             this.columnHeader4.Width = 142;
             // 
-            // btnGetPlaylists
+            // columnHeader5
             // 
-            this.btnGetPlaylists.Location = new System.Drawing.Point(349, 33);
-            this.btnGetPlaylists.Name = "btnGetPlaylists";
-            this.btnGetPlaylists.Size = new System.Drawing.Size(132, 23);
-            this.btnGetPlaylists.TabIndex = 7;
-            this.btnGetPlaylists.Text = "Fetch Playlists";
-            this.btnGetPlaylists.UseVisualStyleBackColor = true;
-            this.btnGetPlaylists.Click += new System.EventHandler(this.btnGetPlaylists_Click);
+            this.columnHeader5.Text = "gid";
+            // 
+            // lvSongs
+            // 
+            this.lvSongs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5});
+            this.lvSongs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvSongs.Location = new System.Drawing.Point(121, 0);
+            this.lvSongs.Name = "lvSongs";
+            this.lvSongs.Size = new System.Drawing.Size(624, 483);
+            this.lvSongs.TabIndex = 2;
+            this.lvSongs.UseCompatibleStateImageBehavior = false;
+            this.lvSongs.View = System.Windows.Forms.View.Details;
             // 
             // lbPlaylists
             // 
-            this.lbPlaylists.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lbPlaylists.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbPlaylists.FormattingEnabled = true;
             this.lbPlaylists.Location = new System.Drawing.Point(0, 0);
             this.lbPlaylists.Name = "lbPlaylists";
-            this.lbPlaylists.Size = new System.Drawing.Size(120, 483);
-            this.lbPlaylists.TabIndex = 1;
+            this.lbPlaylists.Size = new System.Drawing.Size(121, 483);
+            this.lbPlaylists.TabIndex = 4;
             // 
             // GoogleTest
             // 
@@ -203,6 +232,7 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            this.panel3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -216,14 +246,17 @@
         private System.Windows.Forms.TextBox tbPass;
         private System.Windows.Forms.TextBox tbEmail;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button btnCreatePl;
+        private System.Windows.Forms.Button btnFetchSongs;
+        private System.Windows.Forms.Button btnGetPlaylists;
+        private System.Windows.Forms.Button btnSongURL;
         private System.Windows.Forms.ListView lvSongs;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;
-        private System.Windows.Forms.Button btnCreatePl;
-        private System.Windows.Forms.Button btnFetchSongs;
-        private System.Windows.Forms.Button btnGetPlaylists;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.ListBox lbPlaylists;
 
     }

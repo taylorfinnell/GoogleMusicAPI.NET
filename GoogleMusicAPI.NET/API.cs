@@ -24,6 +24,9 @@ namespace GoogleMusicAPI
         public delegate void _GetPlaylists(GoogleMusicPlaylists pls);
         public event _GetPlaylists OnGetPlaylistsComplete;
 
+        public delegate void _GetSongURL(GoogleMusicSongUrl songurl);
+        public event _GetSongURL OnGetSongURL;
+
         #endregion
 
         #region Members
@@ -227,6 +230,36 @@ namespace GoogleMusicAPI
 
             if (OnGetPlaylistsComplete != null)
                 OnGetPlaylistsComplete(playlists);
+        }
+        #endregion
+
+        #region GetSongURL
+        public void GetSongURL(String id)
+        {
+            client.DownloadStringAsync(new Uri(String.Format("https://play.google.com/music/play?u=0&songid={0}&pt=e", id)), SongUrlRecv);
+        }
+
+        private void SongUrlRecv(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
+        {
+            if (error != null)
+            {
+                OnError(error);
+                return;
+            }
+
+            GoogleMusicSongUrl url = null;
+            try
+            {
+                url = JsonConvert.DeserializeObject<GoogleMusicSongUrl>(jsonData);
+            }
+            catch (Exception e)
+            {
+                OnError(e);
+            }
+
+            if (OnGetSongURL != null)
+                OnGetSongURL(url);
+
         }
         #endregion
     }
