@@ -13,22 +13,22 @@ namespace GoogleMusicAPI
         public EventHandler OnLoginComplete;
 
         public delegate void _GetAllSongs(List<GoogleMusicSong> songList);
-        public event _GetAllSongs OnGetAllSongsComplete;
+        public  _GetAllSongs OnGetAllSongsComplete;
 
         public delegate void _AddPlaylist(AddPlaylistResp resp);
-        public event _AddPlaylist OnCreatePlaylistComplete;
+        public  _AddPlaylist OnCreatePlaylistComplete;
 
         public delegate void _Error(Exception e);
         public _Error OnError;
 
         public delegate void _GetPlaylists(GoogleMusicPlaylists pls);
-        public event _GetPlaylists OnGetPlaylistsComplete;
+        public  _GetPlaylists OnGetPlaylistsComplete;
 
         public delegate void _GetSongURL(GoogleMusicSongUrl songurl);
-        public event _GetSongURL OnGetSongURL;
+        public  _GetSongURL OnGetSongURL;
 
         public delegate void _DeletePlaylist(DeletePlaylistResp resp);
-        public event _DeletePlaylist OnDeletePlaylist;
+        public  _DeletePlaylist OnDeletePlaylist;
 
         #endregion
 
