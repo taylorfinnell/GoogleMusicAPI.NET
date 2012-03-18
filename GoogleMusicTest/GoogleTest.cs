@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using GoogleMusicAPI;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace GoogleMusicTest
 {
@@ -20,11 +21,32 @@ namespace GoogleMusicTest
 
             api.OnLoginComplete += OnGMLoginComplete;
             api.OnGetAllSongsComplete += GetAllSongsDone;
+            api.OnCreatePlaylistComplete += api_OnCreatePlaylistComplete;
+            api.OnGetPlaylistsComplete += new API._GetPlaylists(api_OnGetPlaylistsComplete);
+        }
+
+        void api_OnGetPlaylistsComplete(GoogleMusicPlaylists pls)
+        {
+            this.Invoke(new MethodInvoker(delegate
+            {
+                foreach (GoogleMusicPlaylist pl in pls.UserPlaylists)
+                {
+                    lbPlaylists.Items.Add(pl.Title);
+                }
+
+                foreach (GoogleMusicPlaylist pl in pls.InstantMixes)
+                {
+                    lbPlaylists.Items.Add(pl.Title);
+                }
+            }));
         }
 
         void OnGMLoginComplete(object s, EventArgs e)
         {
-            api.GetAllSongs(String.Empty);
+            this.Invoke(new MethodInvoker(delegate
+            {
+                this.Text += " -> Logged in";
+            }));
         }
 
         void GetAllSongsDone(List<GoogleMusicSong> songs)
@@ -47,6 +69,27 @@ namespace GoogleMusicTest
         private void btnLogin_Click(object sender, EventArgs e)
         {
             api.Login(tbEmail.Text, tbPass.Text);
+        }
+
+        void api_OnCreatePlaylistComplete(AddPlaylistResp resp)
+        {
+            if (resp.Success)
+                MessageBox.Show("Created pl");
+        }
+
+        private void btnCreatePl_Click(object sender, EventArgs e)
+        {
+            api.AddPlaylist("Testing");
+        }
+
+        private void btnFetchSongs_Click(object sender, EventArgs e)
+        {
+            api.GetAllSongs(String.Empty);
+        }
+
+        private void btnGetPlaylists_Click(object sender, EventArgs e)
+        {
+            api.GetPlaylists();
         }
     }
 }

@@ -11,6 +11,27 @@ using Newtonsoft.Json;
 
 namespace GoogleMusicAPI
 {
+    public class AddPlaylistResp
+    {
+        [JsonProperty("id")]
+        public String ID { get; set; }
+
+        [JsonProperty("title")]
+        public String Title { get; set; }
+
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+    }
+
+    public class GoogleMusicPlaylists
+    {
+        [JsonProperty("playlists")]
+        public List<GoogleMusicPlaylist> UserPlaylists { get; set; }
+
+        [JsonProperty("magicPlaylists")]
+        public List<GoogleMusicPlaylist> InstantMixes { get; set; }
+    }
+
     public class GoogleMusicPlaylist
     {
         [JsonProperty( "title")]

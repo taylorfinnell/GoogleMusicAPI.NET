@@ -29,23 +29,30 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnFetchSongs = new System.Windows.Forms.Button();
+            this.btnCreatePl = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.btnLogin = new System.Windows.Forms.Button();
+            this.tbPass = new System.Windows.Forms.TextBox();
+            this.tbEmail = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.lvSongs = new System.Windows.Forms.ListView();
-            this.tbEmail = new System.Windows.Forms.TextBox();
-            this.tbPass = new System.Windows.Forms.TextBox();
-            this.btnLogin = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.btnGetPlaylists = new System.Windows.Forms.Button();
+            this.lbPlaylists = new System.Windows.Forms.ListBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnGetPlaylists);
+            this.panel1.Controls.Add(this.btnFetchSongs);
+            this.panel1.Controls.Add(this.btnCreatePl);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.btnLogin);
@@ -57,8 +64,72 @@
             this.panel1.Size = new System.Drawing.Size(745, 98);
             this.panel1.TabIndex = 0;
             // 
+            // btnFetchSongs
+            // 
+            this.btnFetchSongs.Location = new System.Drawing.Point(349, 3);
+            this.btnFetchSongs.Name = "btnFetchSongs";
+            this.btnFetchSongs.Size = new System.Drawing.Size(132, 23);
+            this.btnFetchSongs.TabIndex = 6;
+            this.btnFetchSongs.Text = "Fetch Tracks";
+            this.btnFetchSongs.UseVisualStyleBackColor = true;
+            this.btnFetchSongs.Click += new System.EventHandler(this.btnFetchSongs_Click);
+            // 
+            // btnCreatePl
+            // 
+            this.btnCreatePl.Location = new System.Drawing.Point(349, 64);
+            this.btnCreatePl.Name = "btnCreatePl";
+            this.btnCreatePl.Size = new System.Drawing.Size(132, 23);
+            this.btnCreatePl.TabIndex = 5;
+            this.btnCreatePl.Text = "Create playlist \"Testing\"";
+            this.btnCreatePl.UseVisualStyleBackColor = true;
+            this.btnCreatePl.Click += new System.EventHandler(this.btnCreatePl_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(22, 41);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(56, 13);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Password:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(43, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(35, 13);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Email:";
+            // 
+            // btnLogin
+            // 
+            this.btnLogin.Location = new System.Drawing.Point(213, 64);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(75, 23);
+            this.btnLogin.TabIndex = 2;
+            this.btnLogin.Text = "Login";
+            this.btnLogin.UseVisualStyleBackColor = true;
+            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
+            // 
+            // tbPass
+            // 
+            this.tbPass.Location = new System.Drawing.Point(84, 38);
+            this.tbPass.Name = "tbPass";
+            this.tbPass.Size = new System.Drawing.Size(204, 20);
+            this.tbPass.TabIndex = 1;
+            this.tbPass.UseSystemPasswordChar = true;
+            // 
+            // tbEmail
+            // 
+            this.tbEmail.Location = new System.Drawing.Point(84, 12);
+            this.tbEmail.Name = "tbEmail";
+            this.tbEmail.Size = new System.Drawing.Size(204, 20);
+            this.tbEmail.TabIndex = 0;
+            // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.lbPlaylists);
             this.panel2.Controls.Add(this.lvSongs);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 98);
@@ -81,49 +152,6 @@
             this.lvSongs.UseCompatibleStateImageBehavior = false;
             this.lvSongs.View = System.Windows.Forms.View.Details;
             // 
-            // tbEmail
-            // 
-            this.tbEmail.Location = new System.Drawing.Point(84, 12);
-            this.tbEmail.Name = "tbEmail";
-            this.tbEmail.Size = new System.Drawing.Size(204, 20);
-            this.tbEmail.TabIndex = 0;
-            // 
-            // tbPass
-            // 
-            this.tbPass.Location = new System.Drawing.Point(84, 38);
-            this.tbPass.Name = "tbPass";
-            this.tbPass.Size = new System.Drawing.Size(204, 20);
-            this.tbPass.TabIndex = 1;
-            this.tbPass.UseSystemPasswordChar = true;
-            // 
-            // btnLogin
-            // 
-            this.btnLogin.Location = new System.Drawing.Point(213, 64);
-            this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(75, 23);
-            this.btnLogin.TabIndex = 2;
-            this.btnLogin.Text = "Login";
-            this.btnLogin.UseVisualStyleBackColor = true;
-            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(43, 15);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Email:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(22, 41);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(56, 13);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Password:";
-            // 
             // columnHeader1
             // 
             this.columnHeader1.Text = "ID";
@@ -142,6 +170,25 @@
             // 
             this.columnHeader4.Text = "Album";
             this.columnHeader4.Width = 142;
+            // 
+            // btnGetPlaylists
+            // 
+            this.btnGetPlaylists.Location = new System.Drawing.Point(349, 33);
+            this.btnGetPlaylists.Name = "btnGetPlaylists";
+            this.btnGetPlaylists.Size = new System.Drawing.Size(132, 23);
+            this.btnGetPlaylists.TabIndex = 7;
+            this.btnGetPlaylists.Text = "Fetch Playlists";
+            this.btnGetPlaylists.UseVisualStyleBackColor = true;
+            this.btnGetPlaylists.Click += new System.EventHandler(this.btnGetPlaylists_Click);
+            // 
+            // lbPlaylists
+            // 
+            this.lbPlaylists.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lbPlaylists.FormattingEnabled = true;
+            this.lbPlaylists.Location = new System.Drawing.Point(0, 0);
+            this.lbPlaylists.Name = "lbPlaylists";
+            this.lbPlaylists.Size = new System.Drawing.Size(120, 483);
+            this.lbPlaylists.TabIndex = 1;
             // 
             // GoogleTest
             // 
@@ -174,6 +221,10 @@
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.Button btnCreatePl;
+        private System.Windows.Forms.Button btnFetchSongs;
+        private System.Windows.Forms.Button btnGetPlaylists;
+        private System.Windows.Forms.ListBox lbPlaylists;
 
     }
 }

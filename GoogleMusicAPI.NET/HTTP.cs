@@ -43,7 +43,7 @@ namespace GoogleMusicAPI
         {
             // Create the request
             HttpWebRequest request = SetupRequest(address);
-
+            
 #if !DOTNETCORE
             request.ContentLength = (data != null) ? data.Length : 0;
 #endif
