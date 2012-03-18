@@ -47,6 +47,7 @@
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lvSongs = new System.Windows.Forms.ListView();
             this.lbPlaylists = new System.Windows.Forms.ListBox();
+            this.btnDeletePl = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -54,6 +55,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnDeletePl);
             this.panel1.Controls.Add(this.btnSongURL);
             this.panel1.Controls.Add(this.btnGetPlaylists);
             this.panel1.Controls.Add(this.btnFetchSongs);
@@ -219,6 +221,16 @@
             this.lbPlaylists.Size = new System.Drawing.Size(121, 483);
             this.lbPlaylists.TabIndex = 4;
             // 
+            // btnDeletePl
+            // 
+            this.btnDeletePl.Location = new System.Drawing.Point(510, 38);
+            this.btnDeletePl.Name = "btnDeletePl";
+            this.btnDeletePl.Size = new System.Drawing.Size(138, 23);
+            this.btnDeletePl.TabIndex = 9;
+            this.btnDeletePl.Text = "Delete selected playlist";
+            this.btnDeletePl.UseVisualStyleBackColor = true;
+            this.btnDeletePl.Click += new System.EventHandler(this.btnDeletePl_Click);
+            // 
             // GoogleTest
             // 
             this.AcceptButton = this.btnLogin;
@@ -258,6 +270,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.ListBox lbPlaylists;
+        private System.Windows.Forms.Button btnDeletePl;
 
     }
 }

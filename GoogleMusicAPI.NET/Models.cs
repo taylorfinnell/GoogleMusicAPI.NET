@@ -29,6 +29,12 @@ namespace GoogleMusicAPI
         public bool Success { get; set; }
     }
 
+    public class DeletePlaylistResp
+    {
+        [JsonProperty("deleteId")]
+        public String ID { get; set; }
+    }
+
     public class GoogleMusicPlaylists
     {
         [JsonProperty("playlists")]

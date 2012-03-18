@@ -15,6 +15,8 @@ namespace GoogleMusicTest
     public partial class GoogleTest : Form
     {
         API api = new API();
+        GoogleMusicPlaylists pls;
+
         public GoogleTest()
         {
             InitializeComponent();
@@ -24,6 +26,15 @@ namespace GoogleMusicTest
             api.OnCreatePlaylistComplete += api_OnCreatePlaylistComplete;
             api.OnGetPlaylistsComplete += new API._GetPlaylists(api_OnGetPlaylistsComplete);
             api.OnGetSongURL += new API._GetSongURL(api_OnGetSongURL);
+            api.OnDeletePlaylist += new API._DeletePlaylist(api_OnDeletePlaylist);
+        }
+
+        void api_OnDeletePlaylist(DeletePlaylistResp resp)
+        {
+            if (!String.IsNullOrEmpty(resp.ID))
+            {
+                MessageBox.Show("Deleted");
+            }
         }
 
         void api_OnGetSongURL(GoogleMusicSongUrl songurl)
@@ -33,6 +44,8 @@ namespace GoogleMusicTest
 
         void api_OnGetPlaylistsComplete(GoogleMusicPlaylists pls)
         {
+            this.pls = pls;
+
             this.Invoke(new MethodInvoker(delegate
             {
                 foreach (GoogleMusicPlaylist pl in pls.UserPlaylists)
@@ -105,6 +118,21 @@ namespace GoogleMusicTest
         {
             String id = lvSongs.SelectedItems[0].SubItems[4].Text;
             api.GetSongURL(id);
+        }
+
+        private void btnDeletePl_Click(object sender, EventArgs e)
+        {
+            String id = "";
+            foreach (GoogleMusicPlaylist pl in pls.UserPlaylists)
+            {
+                if(pl.Title.Equals(lbPlaylists.SelectedItem.ToString()))
+                {
+                    id = pl.PlaylistID;
+                    break;
+                }
+            }
+
+            api.DeletePlaylist(id);
         }
     }
 }

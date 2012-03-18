@@ -27,6 +27,9 @@ namespace GoogleMusicAPI
         public delegate void _GetSongURL(GoogleMusicSongUrl songurl);
         public event _GetSongURL OnGetSongURL;
 
+        public delegate void _DeletePlaylist(DeletePlaylistResp resp);
+        public event _DeletePlaylist OnDeletePlaylist;
+
         #endregion
 
         #region Members
@@ -180,7 +183,7 @@ namespace GoogleMusicAPI
         {
             if (error != null)
             {
-                OnError(error);
+                ThrowError(error);
                 return;
             }
 
@@ -192,7 +195,7 @@ namespace GoogleMusicAPI
             }
             catch (Exception e)
             {
-                OnError(e);
+                ThrowError(error);
                 return;
             }
 
@@ -214,8 +217,7 @@ namespace GoogleMusicAPI
         {
             if (error != null)
             {
-                OnError(error);
-                return;
+                ThrowError(error);
             }
 
             GoogleMusicPlaylists playlists = null;
@@ -225,7 +227,7 @@ namespace GoogleMusicAPI
             }
             catch (Exception e)
             {
-                OnError(e);
+                ThrowError(error);
             }
 
             if (OnGetPlaylistsComplete != null)
@@ -243,7 +245,7 @@ namespace GoogleMusicAPI
         {
             if (error != null)
             {
-                OnError(error);
+                ThrowError(error);
                 return;
             }
 
@@ -260,6 +262,56 @@ namespace GoogleMusicAPI
             if (OnGetSongURL != null)
                 OnGetSongURL(url);
 
+        }
+
+        private void ThrowError(Exception error)
+        {
+            if (OnError != null)
+                OnError(error);
+        }
+        #endregion
+
+        #region DeletePlaylist
+        //{"deleteId":"c790204e-1ee2-4160-9e25-7801d67d0a16"}
+        public void DeletePlaylist(String id)
+        {
+            String jsonString = "{\"id\":\"" + id + "\"}";
+
+            JsonConvert.SerializeObject(jsonString);
+
+            Dictionary<String, String> fields = new Dictionary<String, String>
+            {
+               {"json", jsonString}
+            };
+
+            FormBuilder builder = new FormBuilder();
+            builder.AddFields(fields);
+            builder.Close();
+
+            client.UploadDataAsync(new Uri("https://play.google.com/music/services/deleteplaylist"), builder, PlaylistDeleted);
+        }
+
+        private void PlaylistDeleted(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
+        {
+            if (error != null)
+            {
+                ThrowError(error);
+                return;
+            }
+
+            DeletePlaylistResp resp = null;
+            try
+            {
+                resp = JsonConvert.DeserializeObject<DeletePlaylistResp>(jsonData);
+            }
+            catch (System.Exception ex)
+            {
+                ThrowError(ex);
+                return;
+            }
+
+            if (OnDeletePlaylist != null)
+                OnDeletePlaylist(resp);
         }
         #endregion
     }
