@@ -1,109 +1,151 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
 
 namespace GoogleMusicAPI
 {
     public class GoogleHTTP
     {
+        public delegate void RequestCompletedEventHandler(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error);
+
         public static String AuthroizationToken = null;
         public static CookieContainer AuthorizationCookieCont = new CookieContainer();
         public static CookieCollection AuthorizationCookies = new CookieCollection();
 
-        public class GoogleResponse
+        private class RequestState
         {
             public HttpWebRequest Request;
-            public HttpWebResponse Response;
-            public String Data;
+            public byte[] UploadData;
+            public RequestCompletedEventHandler CompletedCallback;
+
+            public RequestState(HttpWebRequest request, byte[] uploadData,  RequestCompletedEventHandler completedCallback)
+            {
+                Request = request;
+                UploadData = uploadData;
+                CompletedCallback = completedCallback;
+            }
         }
 
-        public static void GET(string url, FormBuilder form, Action<GoogleResponse> googleResponseCallback)
+        public HttpWebRequest UploadDataAsync(Uri address, FormBuilder form, RequestCompletedEventHandler complete)
         {
-            GoogleResponse googleResponse = new GoogleResponse();
-
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-            httpWebRequest.ContentType = form.ContentType;
-            httpWebRequest.Method = "GET";
-            httpWebRequest.CookieContainer = AuthorizationCookieCont;
-
-            if (AuthroizationToken != null)
-                httpWebRequest.Headers[HttpRequestHeader.Authorization] = String.Format("GoogleLogin auth={0}", AuthroizationToken);
-
-            Task.Factory.FromAsync<WebResponse>(httpWebRequest.BeginGetResponse, httpWebRequest.EndGetResponse, null).ContinueWith(task2 =>
-            {
-                var resp = task2.Result;
-
-                googleResponse.Response = (HttpWebResponse)resp;
-
-                using (var responseStream = resp.GetResponseStream())
-                {
-                    var reader = new StreamReader(responseStream);
-
-                    googleResponse.Data = reader.ReadToEnd();
-
-                    if (googleResponseCallback != null)
-                    {
-                        googleResponseCallback(googleResponse);
-                    }
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            return UploadDataAsync(address, form.ContentType, form.GetBytes(),complete);
         }
 
-        public static void POST(string url, FormBuilder form, Action<GoogleResponse> googleResponseCallback)
+        public HttpWebRequest UploadDataAsync(Uri address, string contentType, byte[] data,  RequestCompletedEventHandler completedCallback)
         {
-            GoogleResponse googleResponse = new GoogleResponse();
+            HttpWebRequest request = SetupRequest(address);
 
-            if (url.StartsWith("https://play.google.com/music/services/"))
+            if (!String.IsNullOrEmpty(contentType))
+                request.ContentType = contentType;
+
+            request.Method = "POST";
+            RequestState state = new RequestState(request, data, completedCallback);
+            IAsyncResult result = request.BeginGetRequestStream(OpenWrite, state);
+
+            return request;
+        }
+
+
+        public HttpWebRequest DownloadStringAsync(Uri address, RequestCompletedEventHandler completedCallback, int millisecondsTimeout = 10000)
+        {
+            HttpWebRequest request = SetupRequest(address);
+            request.Method = "GET";
+            DownloadDataAsync(request, null, millisecondsTimeout, completedCallback);
+            return request;
+        }
+
+        public void DownloadDataAsync(HttpWebRequest request, byte[] d, int millisecondsTimeout,
+           RequestCompletedEventHandler completedCallback)
+        {
+            RequestState state = new RequestState(request, d, completedCallback);
+            IAsyncResult result = request.BeginGetResponse(GetResponse, state);
+        }
+
+
+        public virtual HttpWebRequest SetupRequest(Uri address)
+        {
+            if (address == null)
+                throw new ArgumentNullException("address");
+
+            if (address.ToString().StartsWith("https://play.google.com/music/services/"))
             {
-                url += String.Format("?u=0&xt={0}", GoogleHTTP.GetCookieValue("xt"));
+                address = new Uri(address.OriginalString + String.Format("?u=0&xt={0}", GoogleHTTP.GetCookieValue("xt")));
             }
 
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-            httpWebRequest.ContentType = form.ContentType;
-            httpWebRequest.Method = "POST";
-            httpWebRequest.CookieContainer = AuthorizationCookieCont;
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(address);
 
+            request.CookieContainer = AuthorizationCookieCont;
+            
             if (AuthroizationToken != null)
-                httpWebRequest.Headers[HttpRequestHeader.Authorization] = String.Format("GoogleLogin auth={0}", AuthroizationToken);
+                request.Headers[HttpRequestHeader.Authorization] = String.Format("GoogleLogin auth={0}", AuthroizationToken);
 
-            byte[] requestBytes = form.GetBytes();
 
-            googleResponse.Request = httpWebRequest;
-
-            Task.Factory.FromAsync<Stream>(httpWebRequest.BeginGetRequestStream, httpWebRequest.EndGetRequestStream, null).ContinueWith(task =>
-            {
-                task.Result.Write(requestBytes, 0, requestBytes.Length);
-
-                Task.Factory.FromAsync<WebResponse>(httpWebRequest.BeginGetResponse, httpWebRequest.EndGetResponse, null).ContinueWith(task2 =>
-                {
-                    var resp = task2.Result;
-
-                    googleResponse.Response = (HttpWebResponse)resp;
-
-                    using (var responseStream = resp.GetResponseStream())
-                    {
-                        var reader = new StreamReader(responseStream);
-
-                        googleResponse.Data = reader.ReadToEnd();
-
-                        if (googleResponseCallback != null)
-                        {
-                            googleResponseCallback(googleResponse);
-                        }
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext());
-
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            return request;
         }
 
-        public static void SetCookieData(CookieContainer cont, CookieCollection coll)
+        void OpenWrite(IAsyncResult ar)
         {
-            AuthorizationCookieCont = cont;
-            AuthorizationCookies = coll;
+            RequestState state = (RequestState)ar.AsyncState;
+
+            try
+            {
+                // Get the stream to write our upload to
+                using (Stream uploadStream = state.Request.EndGetRequestStream(ar))
+                {
+                    byte[] buffer = new Byte[checked((uint)Math.Min(1024, (int)state.UploadData.Length))];
+
+                    MemoryStream ms = new MemoryStream(state.UploadData);
+
+                    int bytesRead;
+                    int i = 0;
+                    while ((bytesRead = ms.Read(buffer, 0, buffer.Length)) != 0)
+                    {
+                        int prog = (int)Math.Floor(Math.Min(100.0,
+                                (((double)(bytesRead * i) / (double)ms.Length) * 100.0)));
+
+
+                        uploadStream.Write(buffer, 0, bytesRead);
+
+                        i++;
+                    }
+                }
+
+                IAsyncResult result = state.Request.BeginGetResponse(GetResponse, state);
+
+
+            }
+            catch (Exception ex)
+            {
+                if (state.CompletedCallback != null)
+                    state.CompletedCallback(state.Request, null, null, ex);
+            }
+        }
+
+        void GetResponse(IAsyncResult ar)
+        {
+            RequestState state = (RequestState)ar.AsyncState;
+            HttpWebResponse response = null;
+            Exception error = null;
+            String result = "";
+
+            try
+            {
+                response = (HttpWebResponse)state.Request.EndGetResponse(ar);
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(responseStream);
+
+                    result = reader.ReadToEnd();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+            }
+
+            if (state.CompletedCallback != null)
+                state.CompletedCallback(state.Request, response, result, error);
         }
 
         public static String GetCookieValue(String cookieName)
@@ -115,6 +157,12 @@ namespace GoogleMusicAPI
             }
 
             return null;
+        }
+
+        public static void SetCookieData(CookieContainer cont, CookieCollection coll)
+        {
+            AuthorizationCookieCont = cont;
+            AuthorizationCookies = coll;
         }
     }
 }

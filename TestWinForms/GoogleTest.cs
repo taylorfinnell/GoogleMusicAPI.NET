@@ -27,10 +27,10 @@ namespace GoogleMusicTest
             api.OnGetPlaylistsComplete += new API._GetPlaylists(api_OnGetPlaylistsComplete);
             api.OnGetSongURL += new API._GetSongURL(api_OnGetSongURL);
             api.OnDeletePlaylist += new API._DeletePlaylist(api_OnDeletePlaylist);
-            api.OnGetPlaylistComplete += api_OnGetPlaylistComplete; 
+            api.OnGetPlaylistComplete += new API._GetPlaylist(api_OnGetPlaylistComplete);
         }
 
-        void api_OnGetPlaylistComplete(GoogleMusicPlaylist pls)
+        void api_OnGetPlaylistComplete(GoogleMusicPlaylist pls2)
         {
             int k = 0;
         }
