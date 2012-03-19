@@ -23,10 +23,37 @@ namespace GoogleMusicAPI
 
         public static void GET(string url, FormBuilder form, Action<GoogleResponse> googleResponseCallback)
         {
-            
+            GoogleResponse googleResponse = new GoogleResponse();
+
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.ContentType = form.ContentType;
+            httpWebRequest.Method = "GET";
+            httpWebRequest.CookieContainer = AuthorizationCookieCont;
+
+            if (AuthroizationToken != null)
+                httpWebRequest.Headers[HttpRequestHeader.Authorization] = String.Format("GoogleLogin auth={0}", AuthroizationToken);
+
+            Task.Factory.FromAsync<WebResponse>(httpWebRequest.BeginGetResponse, httpWebRequest.EndGetResponse, null).ContinueWith(task2 =>
+            {
+                var resp = task2.Result;
+
+                googleResponse.Response = (HttpWebResponse)resp;
+
+                using (var responseStream = resp.GetResponseStream())
+                {
+                    var reader = new StreamReader(responseStream);
+
+                    googleResponse.Data = reader.ReadToEnd();
+
+                    if (googleResponseCallback != null)
+                    {
+                        googleResponseCallback(googleResponse);
+                    }
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        public static void POST(string url, FormBuilder form, Action<GoogleResponse> googleResponseCallback, String method = "POST")
+        public static void POST(string url, FormBuilder form, Action<GoogleResponse> googleResponseCallback)
         {
             GoogleResponse googleResponse = new GoogleResponse();
 
@@ -37,7 +64,7 @@ namespace GoogleMusicAPI
 
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
             httpWebRequest.ContentType = form.ContentType;
-            httpWebRequest.Method = method;
+            httpWebRequest.Method = "POST";
             httpWebRequest.CookieContainer = AuthorizationCookieCont;
 
             if (AuthroizationToken != null)
