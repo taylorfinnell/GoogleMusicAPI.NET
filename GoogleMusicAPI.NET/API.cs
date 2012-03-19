@@ -167,7 +167,6 @@ namespace GoogleMusicAPI
             String jsonString = (plID.Equals("all")) ? "{}" : "{\"id\":\"" + plID + "\"}";
 
             Dictionary<String, String> fields = new Dictionary<String, String>() { };
-
             fields.Add("json", jsonString);
 
             FormBuilder form = new FormBuilder();
@@ -213,7 +212,6 @@ namespace GoogleMusicAPI
         #endregion
 
         #region DeletePlaylist
-        //{"deleteId":"c790204e-1ee2-4160-9e25-7801d67d0a16"}
         public void DeletePlaylist(String id)
         {
             String jsonString = "{\"id\":\"" + id + "\"}";
