@@ -58,54 +58,28 @@ namespace GoogleMusicAPI
                 {"Passwd", password},
             };
 
-            FormBuilder builder = new FormBuilder();
-            builder.AddFields(fields);
-            builder.Close();
+            FormBuilder form = new FormBuilder();
+            form.AddFields(fields);
+            form.Close();
 
-            client.UploadDataAsync(new Uri("https://www.google.com/accounts/ClientLogin"), builder.ContentType, builder.GetBytes(), 10000, GetAuthTokenComplete, null);
-        }
-
-        public void Login(String authToken)
-        {
-            GoogleHTTP.AuthroizationToken = authToken;
-            GetAuthCookies();
-        }
-
-        private void GetAuthTokenComplete(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
-        {
-            if (error != null)
+            Action<GoogleMusicAPI.GoogleHTTP.GoogleResponse> ActionLogin = (g) =>
             {
-                OnError(error);
-                return;
-            }
+                string CountTemplate = @"Auth=(?<AUTH>(.*?))$";
+                Regex CountRegex = new Regex(CountTemplate, RegexOptions.IgnoreCase);
+                GoogleHTTP.AuthroizationToken = CountRegex.Match(g.Data).Groups["AUTH"].ToString();
 
-            string CountTemplate = @"Auth=(?<AUTH>(.*?))$";
-            Regex CountRegex = new Regex(CountTemplate, RegexOptions.IgnoreCase);
-            string auth = CountRegex.Match(jsonData).Groups["AUTH"].ToString();
+                Action<GoogleMusicAPI.GoogleHTTP.GoogleResponse> action2 = (gr) =>
+               {
+                   GoogleHTTP.SetCookieData(gr.Request.CookieContainer, gr.Response.Cookies);
 
-            GoogleHTTP.AuthroizationToken = auth;
+                   if (OnLoginComplete != null)
+                       OnLoginComplete(this, null);
+               };
 
-            GetAuthCookies();
-        }
+                GoogleHTTP.POST("https://play.google.com/music/listen?hl=en&u=0", FormBuilder.Empty, action2);
+            };
 
-        private void GetAuthCookies()
-        {
-            client.UploadDataAsync(new Uri("https://play.google.com/music/listen?hl=en&u=0"), 
-                FormBuilder.Empty, GetAuthCookiesComplete);
-        }
-
-        private void GetAuthCookiesComplete(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
-        {
-            if (error != null)
-            {
-                OnError(error);
-                return;
-            }
-
-            GoogleHTTP.SetCookieData(request.CookieContainer, response.Cookies);
-
-            if (OnLoginComplete != null)
-                OnLoginComplete(this, EventArgs.Empty);
+            GoogleHTTP.POST("https://www.google.com/accounts/ClientLogin", form, ActionLogin);
         }
         #endregion
 
@@ -127,35 +101,30 @@ namespace GoogleMusicAPI
                {"json", jsonString}
             };
 
-            FormBuilder builder = new FormBuilder();
-            builder.AddFields(fields);
-            builder.Close();
+            FormBuilder form = new FormBuilder();
+            form.AddFields(fields);
+            form.Close();
 
-            client.UploadDataAsync(new Uri("https://play.google.com/music/services/loadalltracks"), builder, TrackListChunkRecv);
-        }
-
-        private void TrackListChunkRecv(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
-        {
-            if (error != null)
+            Action<GoogleMusicAPI.GoogleHTTP.GoogleResponse> ActionGetAllSongs = (g) =>
             {
-                OnError(error);
-                return;
-            }
+                GoogleMusicPlaylist pl = JsonConvert.DeserializeObject<GoogleMusicPlaylist>(g.Data);
 
-            GoogleMusicPlaylist chunk = 
-                Newtonsoft.Json.JsonConvert.DeserializeObject <GoogleMusicPlaylist>(jsonData);
+                trackContainer.AddRange(pl.Songs);
 
-            trackContainer.AddRange(chunk.Songs);
+                if (!String.IsNullOrEmpty(pl.ContToken))
+                {
+                    GetAllSongs(pl.ContToken);
+                }
+                else
+                {
+                    if (OnGetAllSongsComplete != null)
+                        OnGetAllSongsComplete(trackContainer);
 
-            if (!String.IsNullOrEmpty(chunk.ContToken))
-            {
-                GetAllSongs(chunk.ContToken);
-            }
-            else
-            {
-                if (OnGetAllSongsComplete != null)
-                    OnGetAllSongsComplete(trackContainer);
-            }
+                    return;
+                }
+            };
+
+            GoogleHTTP.POST("https://play.google.com/music/services/loadalltracks", form, ActionGetAllSongs);
         }
         #endregion
 
@@ -168,42 +137,24 @@ namespace GoogleMusicAPI
         {
             String jsonString = "{\"title\":\"" + playlistName + "\"}";
 
-            JsonConvert.SerializeObject(jsonString);
-
             Dictionary<String, String> fields = new Dictionary<String, String>
             {
                {"json", jsonString}
             };
 
-            FormBuilder builder = new FormBuilder();
-            builder.AddFields(fields);
-            builder.Close();
-
-            client.UploadDataAsync(new Uri("https://play.google.com/music/services/addplaylist"), builder, PlaylistCreated);
-        }
-
-        private void PlaylistCreated(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
-        {
-            if (error != null)
+            Action<GoogleMusicAPI.GoogleHTTP.GoogleResponse> ActionAddPlaylist = (gr) =>
             {
-                ThrowError(error);
-                return;
-            }
+                AddPlaylistResp resp = JsonConvert.DeserializeObject<AddPlaylistResp>(gr.Data);
 
-            AddPlaylistResp resp = null;
+                 if (OnCreatePlaylistComplete != null)
+                     OnCreatePlaylistComplete(resp);
+            };
 
-            try
-            {
-                resp = JsonConvert.DeserializeObject<AddPlaylistResp>(jsonData);
-            }
-            catch (Exception e)
-            {
-                ThrowError(error);
-                return;
-            }
+            FormBuilder form = new FormBuilder();
+            form.AddFields(fields);
+            form.Close();
 
-            if (OnCreatePlaylistComplete != null)
-                OnCreatePlaylistComplete(resp);
+            GoogleHTTP.POST("https://play.google.com/music/services/addplaylist", form, ActionAddPlaylist);
         }
         #endregion
 
@@ -219,100 +170,45 @@ namespace GoogleMusicAPI
 
             fields.Add("json", jsonString);
 
-            FormBuilder builder = new FormBuilder();
-            builder.AddFields(fields);
-            builder.Close();
+            FormBuilder form = new FormBuilder();
+            form.AddFields(fields);
+            form.Close();
+
+            Action<GoogleMusicAPI.GoogleHTTP.GoogleResponse> ActionPlaylistRecv = (gr) =>
+            {
+                GoogleMusicPlaylists playlists = JsonConvert.DeserializeObject<GoogleMusicPlaylists>(gr.Data);
+
+                if (OnGetPlaylistsComplete != null)
+                    OnGetPlaylistsComplete(playlists);
+            };
+
+            Action<GoogleMusicAPI.GoogleHTTP.GoogleResponse> ActionPlaylistRecvSingle = (gr) =>
+            {
+                GoogleMusicPlaylist pl = JsonConvert.DeserializeObject<GoogleMusicPlaylist>(gr.Data);
+
+                if (OnGetPlaylistComplete != null)
+                    OnGetPlaylistComplete(pl);
+            };
 
             if (plID.Equals("all"))
-                client.UploadDataAsync(new Uri("https://play.google.com/music/services/loadplaylist"), builder, PlaylistRecv);
+                GoogleHTTP.POST("https://play.google.com/music/services/loadplaylist", form, ActionPlaylistRecv);
             else
-                client.UploadDataAsync(new Uri("https://play.google.com/music/services/loadplaylist"), builder, PlaylistRecvSingle);
+                GoogleHTTP.POST("https://play.google.com/music/services/loadplaylist", form, ActionPlaylistRecvSingle);
         }
-
-        private void PlaylistRecvSingle(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
-        {
-            if (error != null)
-            {
-                ThrowError(error);
-                return;
-            }
-
-            GoogleMusicPlaylist pl = null;
-            try
-            {
-                pl = JsonConvert.DeserializeObject<GoogleMusicPlaylist>(jsonData);
-            }
-            catch (Exception e)
-            {
-                ThrowError(error);
-                return;
-            }
-
-            if (OnGetPlaylistComplete != null)
-                OnGetPlaylistComplete(pl);
-        }
-
-        private void PlaylistRecv(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
-        {
-            if (error != null)
-            {
-                ThrowError(error);
-                return;
-            }
-
-            GoogleMusicPlaylists playlists = null;
-            try
-            {
-                playlists = JsonConvert.DeserializeObject<GoogleMusicPlaylists>(jsonData);
-            }
-            catch (Exception e)
-            {
-                ThrowError(error);
-                return;
-            }
-
-            if (OnGetPlaylistsComplete != null)
-                OnGetPlaylistsComplete(playlists);
-        }
-        #endregion
-
-        #region GetAutoPlaylists
-
         #endregion
 
         #region GetSongURL
         public void GetSongURL(String id)
         {
-            client.DownloadStringAsync(new Uri(String.Format("https://play.google.com/music/play?u=0&songid={0}&pt=e", id)), SongUrlRecv);
-        }
+            Action<GoogleMusicAPI.GoogleHTTP.GoogleResponse> ActionSongUrlRecv = (gr) =>
+           {
+               GoogleMusicSongUrl url = JsonConvert.DeserializeObject<GoogleMusicSongUrl>(gr.Data);
 
-        private void SongUrlRecv(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
-        {
-            if (error != null)
-            {
-                ThrowError(error);
-                return;
-            }
+               if (OnGetSongURL != null)
+                   OnGetSongURL(url);
+           };
 
-            GoogleMusicSongUrl url = null;
-            try
-            {
-                url = JsonConvert.DeserializeObject<GoogleMusicSongUrl>(jsonData);
-            }
-            catch (Exception e)
-            {
-                OnError(e);
-            }
-
-            if (OnGetSongURL != null)
-                OnGetSongURL(url);
-
-        }
-
-        private void ThrowError(Exception error)
-        {
-            if (OnError != null)
-                OnError(error);
+            GoogleHTTP.GET(String.Format("https://play.google.com/music/play?u=0&songid={0}&pt=e", id), FormBuilder.Empty, ActionSongUrlRecv);
         }
         #endregion
 
@@ -333,31 +229,17 @@ namespace GoogleMusicAPI
             builder.AddFields(fields);
             builder.Close();
 
-            client.UploadDataAsync(new Uri("https://play.google.com/music/services/deleteplaylist"), builder, PlaylistDeleted);
+            Action<GoogleMusicAPI.GoogleHTTP.GoogleResponse> ActionDeletePlaylist = (gr) =>
+            {
+                DeletePlaylistResp resp = JsonConvert.DeserializeObject<DeletePlaylistResp>(gr.Data);
+
+                if (OnDeletePlaylist != null)
+                    OnDeletePlaylist(resp);
+            };
+
+            GoogleHTTP.POST("https://play.google.com/music/services/deleteplaylist", builder,ActionDeletePlaylist);
         }
 
-        private void PlaylistDeleted(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
-        {
-            if (error != null)
-            {
-                ThrowError(error);
-                return;
-            }
-
-            DeletePlaylistResp resp = null;
-            try
-            {
-                resp = JsonConvert.DeserializeObject<DeletePlaylistResp>(jsonData);
-            }
-            catch (System.Exception ex)
-            {
-                ThrowError(ex);
-                return;
-            }
-
-            if (OnDeletePlaylist != null)
-                OnDeletePlaylist(resp);
-        }
         #endregion
     }
 }

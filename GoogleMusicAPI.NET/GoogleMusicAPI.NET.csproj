@@ -45,9 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API.cs" />
-    <Compile Include="GoogleHTTP.cs" />
     <Compile Include="Models.cs" />
-    <Compile Include="HTTP.cs" />
+    <Compile Include="GoogleHTTP.cs" />
     <Compile Include="FormBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
