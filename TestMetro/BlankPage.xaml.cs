@@ -40,7 +40,7 @@ namespace TestMetro
 
         void api_OnGetPlaylistsComplete(GoogleMusicPlaylists pls)
         {
-           
+           // do stuff
         }
 
         /// <summary>
