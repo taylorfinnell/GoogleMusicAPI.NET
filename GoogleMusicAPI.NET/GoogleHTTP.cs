@@ -1,38 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Text;
-
 
 namespace GoogleMusicAPI
 {
-    public class GoogleHTTP : HTTP
+    public class GoogleHTTP
     {
         public static String AuthroizationToken = null;
         public static CookieContainer AuthorizationCookieCont = new CookieContainer();
         public static CookieCollection AuthorizationCookies = new CookieCollection();
 
-        public GoogleHTTP()
+        public class GoogleResponse
         {
-
+            public HttpWebRequest Request;
+            public HttpWebResponse Response;
+            public String Data;
         }
 
-        public override HttpWebRequest SetupRequest(Uri address)
+        public static void GET(string url, FormBuilder form, Action<GoogleResponse> googleResponseCallback)
         {
-            if (address.ToString().StartsWith("https://play.google.com/music/services/"))
+            
+        }
+
+        public static void POST(string url, FormBuilder form, Action<GoogleResponse> googleResponseCallback, String method = "POST")
+        {
+            GoogleResponse googleResponse = new GoogleResponse();
+
+            if (url.StartsWith("https://play.google.com/music/services/"))
             {
-                address = new Uri(address.OriginalString + String.Format("?u=0&xt={0}", GoogleHTTP.GetCookieValue("xt")));
+                url += String.Format("?u=0&xt={0}", GoogleHTTP.GetCookieValue("xt"));
             }
 
-            HttpWebRequest request = base.SetupRequest(address);
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.ContentType = form.ContentType;
+            httpWebRequest.Method = method;
+            httpWebRequest.CookieContainer = AuthorizationCookieCont;
 
-            request.CookieContainer = AuthorizationCookieCont;
-            
             if (AuthroizationToken != null)
-                request.Headers[HttpRequestHeader.Authorization] = String.Format("GoogleLogin auth={0}", AuthroizationToken);
+                httpWebRequest.Headers[HttpRequestHeader.Authorization] = String.Format("GoogleLogin auth={0}", AuthroizationToken);
 
-            return request;
+            byte[] requestBytes = form.GetBytes();
+
+            googleResponse.Request = httpWebRequest;
+
+            Task.Factory.FromAsync<Stream>(httpWebRequest.BeginGetRequestStream, httpWebRequest.EndGetRequestStream, null).ContinueWith(task =>
+            {
+                task.Result.Write(requestBytes, 0, requestBytes.Length);
+
+                Task.Factory.FromAsync<WebResponse>(httpWebRequest.BeginGetResponse, httpWebRequest.EndGetResponse, null).ContinueWith(task2 =>
+                {
+                    var resp = task2.Result;
+
+                    googleResponse.Response = (HttpWebResponse)resp;
+
+                    using (var responseStream = resp.GetResponseStream())
+                    {
+                        var reader = new StreamReader(responseStream);
+
+                        googleResponse.Data = reader.ReadToEnd();
+
+                        if (googleResponseCallback != null)
+                        {
+                            googleResponseCallback(googleResponse);
+                        }
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        public static void SetCookieData(CookieContainer cont, CookieCollection coll)
+        {
+            AuthorizationCookieCont = cont;
+            AuthorizationCookies = coll;
         }
 
         public static String GetCookieValue(String cookieName)
@@ -44,12 +88,6 @@ namespace GoogleMusicAPI
             }
 
             return null;
-        }
-
-        public static void SetCookieData(CookieContainer cont, CookieCollection coll)
-        {
-            AuthorizationCookieCont = cont;
-            AuthorizationCookies = coll;
         }
     }
 }
