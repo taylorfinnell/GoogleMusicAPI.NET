@@ -8,6 +8,20 @@
     mc:Ignorable="d">
 
     <Grid Background="{StaticResource ApplicationPageBackgroundBrush}">
-
+        <TextBox x:Name="tbEmail" HorizontalAlignment="Left" Margin="70,33,0,0" TextWrapping="Wrap" Text="&lt;email&gt;" VerticalAlignment="Top" Height="40" Width="205"/>
+        <TextBox x:Name="tbPass" HorizontalAlignment="Left" Margin="70,96,0,0" TextWrapping="Wrap" Text="&lt;pass&gt;" VerticalAlignment="Top" Height="40" Width="205"/>
+        <Button  Content="Login and get playlists" HorizontalAlignment="Left" Margin="70,164,0,0" VerticalAlignment="Top" Width="205" Click="Button_Click_1"/>
+        <ListBox x:Name ="lbPlaylists" Margin="0,336,0,277" >
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="30 0 30 0 " />
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
     </Grid>
 </Page>
