@@ -7,14 +7,29 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <UserControl.Resources>
+        <DataTemplate x:Key="StandardList">
+        <Grid Margin="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+                <Border Background="{StaticResource ListViewItemPlaceholderRectBrush}" Width="60" Height="60">
+                    <Image Source="{Binding ArtURL}" Stretch="UniformToFill"/>
+                </Border>
+                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                <TextBlock Text="{Binding Name}" Style="{StaticResource ItemTextStyle}" MaxHeight="40"/>
+                    <TextBlock Text="{Binding ID}" Style="{StaticResource CaptionTextStyle}" TextWrapping="NoWrap"/>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+    </UserControl.Resources>
+    
     <Grid Background="{StaticResource ApplicationPageBackgroundBrush}">
-        <TextBox x:Name="tbEmail" HorizontalAlignment="Left" Margin="70,33,0,0" TextWrapping="Wrap" Text="&lt;email&gt;" VerticalAlignment="Top" Height="40" Width="205"/>
-        <TextBox x:Name="tbPass" HorizontalAlignment="Left" Margin="70,96,0,0" TextWrapping="Wrap" Text="&lt;pass&gt;" VerticalAlignment="Top" Height="40" Width="205"/>
-        <Button  Content="Login and get playlists" HorizontalAlignment="Left" Margin="70,164,0,0" VerticalAlignment="Top" Width="205" Click="Button_Click_1"/>
-        <ListBox x:Name ="lbPlaylists" Margin="0,336,0,277" >
+        <ListBox Height="96" HorizontalAlignment="Left" Margin="10,10,0,0" Name="listbox2" VerticalAlignment="Top" Width="1346" Background="Transparent" Foreground="White" FontSize="48">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical" />
+                    <StackPanel Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListBox.ItemContainerStyle>
@@ -22,6 +37,13 @@
                     <Setter Property="Padding" Value="30 0 30 0 " />
                 </Style>
             </ListBox.ItemContainerStyle>
+            <ListBoxItem Content="albums"  />
+            <ListBoxItem Content="artists"  />
+            <ListBoxItem Content="genere" />
         </ListBox>
+        <ListView x:Name="itemListView" HorizontalAlignment="Left" Height="618" Margin="10,140,0,0" VerticalAlignment="Top" Width="1346"
+                  ItemTemplate="{StaticResource StandardList}">
+
+        </ListView>
     </Grid>
 </Page>

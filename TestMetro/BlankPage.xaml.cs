@@ -29,39 +29,24 @@ namespace TestMetro
         public BlankPage()
         {
             this.InitializeComponent();
+            api.OnLoginComplete += OnLoginComplete;
+            api.OnGetAllSongsComplete += OnGetAllSongsCompleted;
 
-            api.OnLoginComplete += OnGMLoginComplete;
-            api.OnGetPlaylistsComplete += api_OnGetPlaylistsComplete;
-            
+            api.Login("", "");
         }
 
-        void OnGMLoginComplete(object s, EventArgs e)
+        void OnLoginComplete(object s, EventArgs e)
         {
-            api.GetPlaylist();
+            api.GetAllSongs();
         }
 
-        void api_OnGetPlaylistsComplete(GoogleMusicPlaylists pls)
+        void OnGetAllSongsCompleted(List<GoogleMusicSong> songs)
         {
-            Dispatcher.Invoke(CoreDispatcherPriority.Normal, (x, y) => 
-            { 
-                foreach (GoogleMusicPlaylist p in pls.UserPlaylists)
-                    lbPlaylists.Items.Add(p.Title); 
+            Dispatcher.Invoke(CoreDispatcherPriority.Normal, (x, y) =>
+            {
+                foreach (GoogleMusicSong song in songs)
+                    itemListView.Items.Add(song);
             }, this, null);
-            
-        }
-
-        /// <summary>
-        /// Invoked when this page is about to be displayed in a Frame.
-        /// </summary>
-        /// <param name="e">Event data that describes how this page was reached.  The Parameter
-        /// property is typically used to configure the page.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            api.Login(tbEmail.Text, tbPass.Text);
         }
     }
 }
