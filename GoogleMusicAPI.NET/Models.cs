@@ -166,7 +166,7 @@ namespace GoogleMusicAPI
         {
             get
             {
-                return (!albumart.StartsWith("http:")) ? "http:" + albumart : albumart;
+                return (albumart != null && !albumart.StartsWith("http:")) ? "http:" + albumart : albumart;
             }
             set { albumart = value; }
         }
