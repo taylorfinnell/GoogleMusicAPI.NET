@@ -77,6 +77,7 @@ namespace GoogleMusicTest
         void GetAllSongsDone(List<GoogleMusicSong> songs)
         {
             int num = 1;
+			this.Invoke(new MethodInvoker(delegate { lvSongs.BeginUpdate(); }));
             foreach (GoogleMusicSong song in songs)
             {
                 ListViewItem lvi = new ListViewItem();
@@ -85,13 +86,15 @@ namespace GoogleMusicTest
                 lvi.SubItems.Add(song.Artist);
                 lvi.SubItems.Add(song.Album);
                 lvi.SubItems.Add(song.ID);
+				lvi.SubItems.Add(song.Type.ToString());
                 this.Invoke(new MethodInvoker( delegate {
                     lvSongs.Items.Add(lvi);
                 }));
 
-                if (num >= 100)
-                    break;
+				//if (num >= 100)
+				//	break;
             }
+			this.Invoke(new MethodInvoker(delegate { lvSongs.EndUpdate(); }));
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
