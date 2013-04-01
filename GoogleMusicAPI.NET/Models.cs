@@ -8,7 +8,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization;
 
-
 namespace GoogleMusicAPI
 {
     [DataContract]
@@ -102,7 +101,7 @@ namespace GoogleMusicAPI
         public double LastPlayed { get; set; }
 
         [DataMember(Name= "type")]
-        public int Type { get; set; }
+        public GoogleMusicType Type { get; set; }
 
         [DataMember(Name= "disc")]
         public int Disc { get; set; }
@@ -185,4 +184,15 @@ namespace GoogleMusicAPI
             }
         }
     }
+
+	public enum GoogleMusicType : int
+	{
+		Purchased = 1,
+		Uploaded = 2,
+		Matched = 6
+	}
 }
+
+
+	
+
