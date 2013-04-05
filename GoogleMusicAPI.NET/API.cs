@@ -32,11 +32,18 @@ namespace GoogleMusicAPI
         public delegate void _DeletePlaylist(DeletePlaylistResp resp);
         public _DeletePlaylist OnDeletePlaylist;
 
+        public delegate void _ReportProgress(int tracksReceived, int totalTracks);
+        public _ReportProgress OnReportProgress;
+
         #endregion
 
         #region Members
-        GoogleHTTP client;
+
+        private GoogleHTTP client;
         private List<GoogleMusicSong> trackContainer;
+        private int _totalTracks;
+        private int _tracksReceived;
+
         #endregion
 
         #region Constructor
@@ -48,6 +55,7 @@ namespace GoogleMusicAPI
         #endregion
 
         #region Login
+
         public void Login(String email, String password)
         {
             Dictionary<String, String> fields = new Dictionary<String, String>
@@ -61,7 +69,7 @@ namespace GoogleMusicAPI
             form.AddFields(fields);
             form.Close();
 
-            client.UploadDataAsync(new Uri("https://www.google.com/accounts/ClientLogin"), form.ContentType, form.GetBytes(),  GetAuthTokenComplete);
+            client.UploadDataAsync(new Uri("https://www.google.com/accounts/ClientLogin"), form.ContentType, form.GetBytes(), GetAuthTokenComplete);
         }
 
         public void Login(String authToken)
@@ -72,10 +80,11 @@ namespace GoogleMusicAPI
 
         private void GetAuthTokenComplete(HttpWebRequest request, HttpWebResponse response, String jsonData, Exception error)
         {
-            if (error != null)
+            if (error != null && OnError != null)
             {
                 OnError(error);
                 return;
+
             }
 
             string CountTemplate = @"Auth=(?<AUTH>(.*?))$";
@@ -101,11 +110,20 @@ namespace GoogleMusicAPI
                 return;
             }
 
+            GetTotalTracks(jsonData);
+
             GoogleHTTP.SetCookieData(request.CookieContainer, response.Cookies);
 
             if (OnLoginComplete != null)
                 OnLoginComplete(this, EventArgs.Empty);
         }
+
+        private void GetTotalTracks(String jsonData)
+        {
+            Regex regEx = new Regex(@"window\['TOTAL_TRACKS'\]\s=\s*(?<tracks>[0-9]*)");
+            _totalTracks = int.Parse(regEx.Match(jsonData).Groups["tracks"].Value);
+        }
+
         #endregion
 
         #region GetAllSongs
@@ -116,6 +134,12 @@ namespace GoogleMusicAPI
         public void GetAllSongs(String continuationToken = "")
         {
             List<GoogleMusicSong> library = new List<GoogleMusicSong>();
+
+            if (string.IsNullOrEmpty(continuationToken))
+            {
+                trackContainer.Clear();
+                _tracksReceived = 0;
+            }
 
             String jsonString = "{\"continuationToken\":\"" + continuationToken + "\"}";
 
@@ -139,9 +163,12 @@ namespace GoogleMusicAPI
                 return;
             }
 
-            GoogleMusicPlaylist chunk =JSON.DeserializeObject<GoogleMusicPlaylist>(jsonData);
+            GoogleMusicPlaylist chunk = JSON.DeserializeObject<GoogleMusicPlaylist>(jsonData);
 
             trackContainer.AddRange(chunk.Songs);
+
+            if (OnReportProgress != null)
+                OnReportProgress(_tracksReceived += chunk.Songs.Count, _totalTracks);
 
             if (!String.IsNullOrEmpty(chunk.ContToken))
             {
@@ -149,10 +176,12 @@ namespace GoogleMusicAPI
             }
             else
             {
+
                 if (OnGetAllSongsComplete != null)
                     OnGetAllSongsComplete(trackContainer);
             }
         }
+
         #endregion
 
         #region AddPaylist
